@@ -158,6 +158,9 @@ let getRecipeByID = (req, res) => {
 
 //Middleware
 app.use(bodyParser.json());
+app.get('/', function(req, res) {
+  res.send("Welcome to NodeJS app on Heroku!");
+});
 app.get('/recipes', getMyRecipes)
 app.post('/recipes', postRecipe)
 app.get('/all-recipes', getAllRecipes)
