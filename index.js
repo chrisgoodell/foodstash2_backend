@@ -27,6 +27,18 @@ let searchTerms = (req, res) =>
   .then(terms => res.send(terms))
   .catch(err => res.send(err))
 
+let getUserDataQuery = (userId) =>
+  db.query(`SELECT * from users where id = ${userId};`)
+
+let getUserData = async (req, res) => {
+  let token = req.headers.authorization;
+  let result = tokenValidator(token);
+  console.log('yo');
+  console.log(result);
+  let userData = await getUserDataQuery(result.userId);
+  res.send(userData);
+}
+
 let postRecipeToDB = (recipe, userId) => {
   console.log(recipe.title, recipe.ver, recipe.prepmins, recipe.cookmins, recipe.descr, userId )
   return (
@@ -186,6 +198,7 @@ app.use(bodyParser.json());
 app.get('/', function(req, res) {
   res.send("Welcome to NodeJS App on Heroku");
 });
+app.get('/get-user', getUserData)
 app.get('/all-categories', getAllCategories)
 app.get('/all-ingredients', getAllIngredients)
 app.get('/recipes', getMyRecipes)
