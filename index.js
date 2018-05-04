@@ -183,6 +183,9 @@ let getIdsFromLibrary = (req, res) => {
 
 //Middleware
 app.use(bodyParser.json());
+app.get('/', function(req, res) {
+  res.send("Welcome to NodeJS App on Heroku");
+});
 app.get('/all-categories', getAllCategories)
 app.get('/all-ingredients', getAllIngredients)
 app.get('/recipes', getMyRecipes)
