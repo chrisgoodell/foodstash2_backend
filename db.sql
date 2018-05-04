@@ -227,14 +227,14 @@ CREATE TABLE "public"."recipes" (
     "prepmins" character varying NOT NULL,
     "cookmins" character varying NOT NULL,
     "description" character varying NOT NULL,
-    "tag" character varying DEFAULT ''::character varying NOT NULL,
     "user_id" integer NOT NULL,
     "directions" character varying,
     "servings" character varying DEFAULT 1 NOT NULL,
     "image_url" character varying,
     "categories_id" integer,
     "ingredients" character varying,
-    "notes" character varying
+    "notes" character varying,
+    "tag" "text"[]
 );
 
 
@@ -406,9 +406,9 @@ COPY "public"."ratings" ("id", "rating_value", "recipe_id") FROM stdin;
 -- Data for Name: recipes; Type: TABLE DATA; Schema: public; Owner: zgeyxcdsfampek
 --
 
-COPY "public"."recipes" ("id", "title", "version", "derived_id", "prepmins", "cookmins", "description", "tag", "user_id", "directions", "servings", "image_url", "categories_id", "ingredients", "notes") FROM stdin;
-3	Baja Fish Tacos	1	$3$	20	30	Some description		1	{"1": "Cook fish", "2": "Make tacos"}	2	https://res.cloudinary.com/hellofresh/image/upload/f_auto,fl_lossy,q_80,w_auto:100:1280/v1/hellofresh_s3/image/blackened-fish-tacos-f8fdce33.jpg	\N	\N	\N
-1	Peanut Butter Pie	1	$1$	45	30	Some description		1	{"1": "First direction", "2": "Second direction"}	8	https://food.fnr.sndimg.com/content/dam/images/food/fullset/2012/11/19/1/WU0313H_chocolate-peanut-butter-pie-recipe_s4x3.jpg.rend.hgtvcom.616.462.suffix/1371612178437.jpeg	\N	\N	\N
+COPY "public"."recipes" ("id", "title", "version", "derived_id", "prepmins", "cookmins", "description", "user_id", "directions", "servings", "image_url", "categories_id", "ingredients", "notes", "tag") FROM stdin;
+3	Baja Fish Tacos	1	$3$	20	30	Some description	1	{"1": "Cook fish", "2": "Make tacos"}	2	https://res.cloudinary.com/hellofresh/image/upload/f_auto,fl_lossy,q_80,w_auto:100:1280/v1/hellofresh_s3/image/blackened-fish-tacos-f8fdce33.jpg	\N	\N	\N	\N
+1	Peanut Butter Pie	1	$1$	45	30	Some description	1	{"1": "First direction", "2": "Second direction"}	8	https://food.fnr.sndimg.com/content/dam/images/food/fullset/2012/11/19/1/WU0313H_chocolate-peanut-butter-pie-recipe_s4x3.jpg.rend.hgtvcom.616.462.suffix/1371612178437.jpeg	\N	\N	\N	\N
 \.
 
 
