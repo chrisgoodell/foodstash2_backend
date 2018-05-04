@@ -7,6 +7,6 @@
     "pg-promise": "^8.4.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   }
 }
