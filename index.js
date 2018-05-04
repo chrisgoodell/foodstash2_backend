@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const signature = '@!3$%%^&1ed^&*!l@#^&***()R0441';
 const bodyParser = require('body-parser');
-const port = process.end.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 //db queries
 let createUser = (user) =>
