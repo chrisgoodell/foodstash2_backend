@@ -27,14 +27,25 @@ let searchTerms = (req, res) =>
   .then(terms => res.send(terms))
   .catch(err => res.send(err))
 
+let getUserDataQuery = (userId) =>
+  db.query(`SELECT * from users where id = ${userId};`)
+
+let getUserData = async (req, res) => {
+  let token = req.headers.authorization;
+  let result = tokenValidator(token);
+  console.log('yo');
+  console.log(result);
+  let userData = await getUserDataQuery(result.userId);
+  res.send(userData);
+}
+
 let postRecipeToDB = (recipe, userId) => {
   console.log(recipe.title, recipe.ver, recipe.prepmins, recipe.cookmins, recipe.descr, userId )
   return (
     db.query(`INSERT INTO "public"."recipes"("title", "version", "prepmins", "cookmins",
-    "description", "user_id", "ingredients", "directions", "servings", "derived_id", "image_url", "categories_id", tag)
+    "description", "user_id", "ingredients", "directions", "servings", "derived_id", "image_url", tag)
     VALUES('${recipe.title}',${recipe.ver}, ${recipe.prepmins}, ${recipe.cookmins}, '${recipe.descr}', ${userId},
-    '${recipe.ingredients}', '${recipe.directions}', ${recipe.servings}, '${null}', '${recipe.image_url}', '${recipe.categories_id}',
-     'none')
+    '${recipe.ingredients}', '${recipe.directions}', ${recipe.servings}, '$1', 'google.com', 'none')
     RETURNING "id", "title", "version", "derived_id", "prepmins", "cookmins",
     "description", "tag", "user_id", "ingredients", "directions", "servings", "image_url";`)
   )
@@ -78,18 +89,9 @@ let getAllIngredients = (req, res) =>
   db.query(`SELECT * from ingredients`)
     .then(ingredients => res.send(ingredients))
 
-let getRecipesByCategoriesQuery = (catId) =>
-  db.query(`SELECT * from recipes WHERE categories_id  = ${catId};`)
-
-let getRecipesByCategories = async (req, res) => {
-  console.dir(req.headers);
-  if (!req.headers || !req.headers.id) throw new Error('please send an id');
-  res.send(await getRecipesByCategoriesQuery(req.headers.id))
-}
-
 let getSearchedRecipes = (queryString) => {
   let queryBuilder = `SELECT * from recipes WHERE id IN (`
-  queryString.forEach(id => queryBuilder = queryBuilder + id + ',');
+  queryString.forEach(number => queryBuilder = queryBuilder + number + ',');
   queryBuilder = queryBuilder.slice(0, -1);
   queryBuilder += ');';
   console.log(queryBuilder)
@@ -112,16 +114,6 @@ let validateCredentials = (res, email, password) => {
   .then(userId => createToken(userId))
   .then(token => { console.log(token); return res.send(token)})
   .catch(error => res.send(error));
-}
-
-let getUserDataQuery = (userId) =>
-  db.query(`SELECT * from users where id = ${userId};`)
-    
-let getUserData = async (req, res) => {
-  let token = req.headers.authorization;
-  let result = tokenValidator(token);
-  let userData = await getUserDataQuery(result.userId);
-  res.send(userData);
 }
 
 let tokenValidator = (token) =>
@@ -184,30 +176,30 @@ let postCookBook = (req, res) => {
   )
 }
 
-let getRecipeByID = async (req, res) => {
-  if (!req.headers || !req.headers.id) throw new Error('please send an id');
-  res.send(await getRecipeFromDB(req.headers.id))
-  
+let getRecipeByID = (req, res) => {
+  let id = req.headers.id;
+  // console.log(id);
+  getRecipeFromDB(id)
+  .then(response => res.send(response))
+  .catch(err => res.send(err))
 }
 
-let searchRecipes = async (req, res) => {
-  try {
-    let recipes = await db.query(`SELECT * from recipes;`);
-    let searchString = req.body.searchString.slice(1);
-    res.send((searchString === "")? recipes : recipes.filter(c => c.title.toLowerCase().match(searchString.toLowerCase())));
-  } catch (error) {
-    throw new Error('this is not working out for us');
-  }
+let getIdsFromLibrary = (req, res) => {
+  let queryString = [];
+  let library = req.body.searchLibrary;
+  library.map(item => queryString.push(item.id))
+  getSearchedRecipes(queryString)
+  .then(response => res.send(response))
+  .catch(err => res.send(err))
 }
 
 //Middleware
 app.use(bodyParser.json());
-app.get('/', function (req, res) {
-  res.send("Welcome to NodeJS app on Heroku!");
+app.get('/', function(req, res) {
+  res.send("Welcome to NodeJS App on Heroku");
 });
 app.get('/get-user', getUserData)
 app.get('/all-categories', getAllCategories)
-app.get('/recipe-by-category', getRecipesByCategories)
 app.get('/all-ingredients', getAllIngredients)
 app.get('/recipes', getMyRecipes)
 app.post('/recipes', postRecipe)
@@ -218,11 +210,7 @@ app.post('/users', postUser)
 app.post('/signin', signIn)
 app.get('/recipe', getRecipeByID)
 app.get('/search', searchTerms)
-app.post('/search-recipes', searchRecipes)
+app.post('/search-recipes', getIdsFromLibrary)
 
-app.use(function (err, req, res, next) {
-  console.error(err.stack)
-  res.status(500).send('Something broke!')
-})
 
 app.listen(port, () => console.log('Recipes running on 3000'))
