@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const signature = '@!3$%%^&1ed^&*!l@#^&***()R0441';
 const bodyParser = require('body-parser');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 //db queries
 let createUser = (user) =>
@@ -225,4 +225,4 @@ app.use(function (err, req, res, next) {
   res.status(500).send('Something broke!')
 })
 
-app.listen(port, () => console.log('Recipes running on 3000'))
+app.listen(port, () => console.log(`Recipes running on ${port}`))
