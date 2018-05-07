@@ -202,6 +202,7 @@ let searchRecipes = async (req, res) => {
 
 //Middleware
 app.use(bodyParser.json());
+app.use(express.static('build'));
 app.get('/', function (req, res) {
   res.send("Welcome to NodeJS app on Heroku!");
 });
